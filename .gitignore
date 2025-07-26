@@ -1,0 +1,30 @@
+# NetBeans project files
+nbproject/private/
+build/
+dist/
+nbbuild.xml
+.nb-gradle/
+
+# Class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Runtime files
+*ID.txt
+
+# OS-specific
+.DS_Store
+
+build
+fil_personal
+fil_personal.pub
