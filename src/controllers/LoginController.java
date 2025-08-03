@@ -49,18 +49,22 @@ public class LoginController {
     boolean isValid=false;
     @FXML
     private void handleLoginButtonClick() {
+        // kani pang kuhaon niya ang mga value sa username, password og sa dropdown (admin, faculty, student)
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
         String userType = userComboBox.getValue();
         
+        // kani pang print niya ang userType
         System.out.println(userType);
 
+        // i-Validate niya and  username and password, dapat dili empty
+        // kung empty mag alert
         if (username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Input Error", "username and password cannot be empty.");
             return;
         }
 
-        // Show loading
+        // display niya ang loading spinner, para maka ingun ang user nga naga load pa ang dashboard
         loadingOverlay.setVisible(true);
 
         // Run login check in a new thread
@@ -68,9 +72,11 @@ public class LoginController {
             
             try {
                 System.out.println(userType);
+                // tawagun niya ang validateLogin method sa baba
                 isValid = validateLogin(username, password, userType);
             } catch (Exception ex) {
                 Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+
             }
 
             try {
@@ -80,7 +86,7 @@ public class LoginController {
             }
 
             javafx.application.Platform.runLater(() -> {
-                loadingOverlay.setVisible(false);
+                loadingOverlay.setVisible(false); // ----> diri gi-false siya diri kay na success na og login
                 if (isValid) {
                     showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + userType + "!");
                     navigateToDashboard(userType);
@@ -90,26 +96,34 @@ public class LoginController {
             });
         }).start();
     }
+
     String id = "";
+
+    // dawatung dri ang username, password, userType
     private boolean validateLogin(String username, String password, String userType) throws Exception{
         String query = "";
         
+        // kaning switch, kung ang gi-pili sa dropdown kay admin, faculty, student
         switch (userType) {
-            case "ADMIN":
+            case "ADMIN": // kung admin kani ang i-run
                 query = "SELECT * FROM admin WHERE (username = ? OR email = ?) AND password = ?";
+                // query = "SELECT * FROM admin WHERE (username = 'admin' OR email = 'admin') AND password = 'admin'";
                 break;
-            case "FACULTY":
+            case "FACULTY": // kung faculty kani ang i-run
                 query = "SELECT * FROM faculty WHERE (username = ? OR email = ?) AND password = ?";
+                // query = "SELECT * FROM faculty WHERE (username = 'admin' OR email = 'admin') AND password = 'admin'";
                 break;
-            case "STUDENT":
+            case "STUDENT": // kung student kani ang i-run
                 query = "SELECT * FROM student WHERE (username = ? OR email = ?) AND password = ?";
+                // query = "SELECT * FROM student WHERE (username = 'nathan' OR email = 'nathan') AND password = '090807'";
                 break;
             default:
                 return false;
         }
 
-        try (Connection conn = DBConnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        // 
+        try (Connection conn = DBConnector.getConnection(); // tawagun niya ang src/utils/DBConnector.java
+            PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, username);
             stmt.setString(2, username); // username or email
