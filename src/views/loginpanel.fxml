@@ -31,12 +31,6 @@
         <Text fx:id="schoolYearText" layoutX="94.0" layoutY="367.0" text="School Year:" />
         <Text fx:id="yearText" layoutX="167.0" layoutY="367.0" text="2024-2025" />
         <Line fx:id="dividerLine" endX="100.0" layoutX="159.0" layoutY="371.0" startX="-100.0" />
-
-        <ImageView fx:id="logoImage" fitHeight="257.0" fitWidth="240.0" layoutX="31.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
-          <image>
-            <Image url="@../../images/logo2.png" />
-          </image>
-        </ImageView>
       </children>
     </Pane>
 
