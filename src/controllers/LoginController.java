@@ -1,17 +1,18 @@
 package controllers;
 
-import java.io.BufferedWriter;
-import java.io.File;
+import App.Controllers.sessionController;
+import App.Controllers.studentFrameController;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.PasswordField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import utils.DBConnector;
 
 import java.io.IOException;
@@ -19,19 +20,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class LoginController {
 
     @FXML
-    private AnchorPane anchorPane;
-    @FXML
     private TextField usernameField;
     @FXML
     private PasswordField passwordField;
-    @FXML
-    private ComboBox<String> userComboBox;
     @FXML
     private Button loginButton;
     @FXML
@@ -40,56 +35,97 @@ public class LoginController {
     private AnchorPane loadingOverlay;
     @FXML
     private ProgressIndicator loadingSpinner;
+    @FXML
+    private VBox userSelectionVBox;
+    @FXML
+    private VBox loginFormVBox;
+    @FXML
+    private Text loginTitleText;
+    @FXML
+    private Button backButton;
+
+    private String selectedUserType;
 
     @FXML
     public void initialize() {
-        userComboBox.getItems().addAll("ADMIN", "FACULTY", "STUDENT");
-        userComboBox.setValue("ADMIN");
+        // Start with the login form hidden
         loadingOverlay.setVisible(false);
+        loginFormVBox.setVisible(false);
+        loginFormVBox.setManaged(false);
+    }
+
+    @FXML
+    private void handleAdminLoginSelect(MouseEvent event) {
+        showLoginForm("ADMIN");
+    }
+
+    @FXML
+    private void handleFacultyLoginSelect(MouseEvent event) {
+        showLoginForm("FACULTY");
+    }
+
+    @FXML
+    private void handleStudentLoginSelect(MouseEvent event) {
+        showLoginForm("STUDENT");
+    }
+
+    @FXML
+    private void handleBackButtonClick() {
+        // Hide the login form and show the user type selection
+        userSelectionVBox.setVisible(true);
+        userSelectionVBox.setManaged(true);
+        loginFormVBox.setVisible(false);
+        loginFormVBox.setManaged(false);
+    }
+
+    private void showLoginForm(String userType) {
+        selectedUserType = userType;
+        loginTitleText.setText(userType.substring(0, 1).toUpperCase() + userType.substring(1).toLowerCase() + " Login");
+
+        // Hide the user type selection and show the login form
+        userSelectionVBox.setVisible(false);
+        userSelectionVBox.setManaged(false);
+        loginFormVBox.setVisible(true);
+        loginFormVBox.setManaged(true);
     }
 
     @FXML
     private void handleLoginButtonClick() {
         final String username = usernameField.getText().trim();
         final String password = passwordField.getText().trim();
-        final String userType = userComboBox.getValue();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Input Error", "Please fill in both fields.");
+            showAlert(Alert.AlertType.WARNING, "Input Error", "Please fill in all fields.");
             return;
         }
 
-        // Use a Task for background work to keep UI responsive
+        // Use a Task for background login validation to keep the UI responsive
         Task<LoginResult> loginTask = new Task<>() {
             @Override
             protected LoginResult call() throws Exception {
-                // Simulate network latency
-                Thread.sleep(500);
-                return validateLogin(username, password, userType);
+                Thread.sleep(500); // Simulate network latency
+                return validateLogin(username, password, selectedUserType);
             }
         };
 
-        // What to do when the task succeeds
         loginTask.setOnSucceeded(event -> {
             LoginResult result = loginTask.getValue();
             if (result != null) {
                 showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + result.getUserName() + "!");
-                navigateToDashboard(userType, result.getUserId());
-                return;
+                navigateToDashboard(selectedUserType, result.getUserId());
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid credentials. Please try again.");
             }
-            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid credentials. Please try again.");
         });
 
-        // What to do if the task fails
         loginTask.setOnFailed(event -> {
             showAlert(Alert.AlertType.ERROR, "Login Error", "An error occurred during login. Please check the console.");
             loginTask.getException().printStackTrace();
         });
 
-        // Bind loading overlay visibility to task running state
+        // Bind the loading overlay's visibility to the task's running state
         loadingOverlay.visibleProperty().bind(loginTask.runningProperty());
 
-        // Start the task
         new Thread(loginTask).start();
     }
 
@@ -115,7 +151,7 @@ public class LoginController {
                 nameColumn = "fullname";
                 break;
             default:
-                return null;
+                return null; // Should not happen
         }
 
         try (Connection conn = DBConnector.getConnection();
@@ -125,17 +161,17 @@ public class LoginController {
             stmt.setString(2, username);
             stmt.setString(3, password);
 
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String userId = rs.getString(idColumn);
-                String userName = rs.getString(nameColumn);
-                return new LoginResult(userId, userName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String userId = rs.getString(idColumn);
+                    String userName = rs.getString(nameColumn);
+                    return new LoginResult(userId, userName);
+                }
             }
             return null; // Login failed
         } catch (SQLException e) {
             e.printStackTrace();
-            throw e; // Re-throw to be caught by onFailed handler
+            throw e; // Re-throw to be caught by the onFailed handler
         }
     }
 
@@ -158,18 +194,12 @@ public class LoginController {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
                 Parent dashboardPane = loader.load();
 
-                // Pass the userId to the new controller AFTER loading the FXML
-                switch (userType) {
-                    case "FACULTY":
-                        // Assuming sessionController has an initData(String userId) method
-                        App.Controllers.sessionController sessionCtrl = loader.getController();
-                        sessionCtrl.initData(userId); 
-                        break;
-                    case "STUDENT":
-                        // Assuming studentFrameController has an initData(String userId) method
-                        App.Controllers.studentFrameController studentCtrl = loader.getController();
-                        studentCtrl.initData(userId);
-                        break;
+                // Pass user data to the new controller
+                Object controller = loader.getController();
+                if (userType.equals("FACULTY") && controller instanceof sessionController) {
+                    ((sessionController) controller).initData(userId);
+                } else if (userType.equals("STUDENT") && controller instanceof studentFrameController) {
+                    ((studentFrameController) controller).initData(userId);
                 }
 
                 Stage dashboardStage = new Stage();
@@ -177,7 +207,7 @@ public class LoginController {
                 dashboardStage.setScene(new Scene(dashboardPane));
                 dashboardStage.show();
 
-                // Close current login window
+                // Close the login window
                 Stage currentStage = (Stage) loginButton.getScene().getWindow();
                 currentStage.close();
             }
@@ -190,7 +220,7 @@ public class LoginController {
 
     @FXML
     private void handleForgotPasswordClick() {
-        showAlert(Alert.AlertType.INFORMATION, "Forgot Password", "Password reset functionality coming soon!");
+        showAlert(Alert.AlertType.INFORMATION, "Forgot Password", "Password reset functionality is not yet implemented.");
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
