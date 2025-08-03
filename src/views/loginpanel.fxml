@@ -8,60 +8,70 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
-   <children>
-      <!-- LEFT PANEL WITH IMAGE -->
-      <Pane fx:id="leftPane" prefHeight="400.0" prefWidth="302.0" style="-fx-background-color: lightgray;">
-         <children>
-            <ImageView fx:id="sideImage" fitHeight="400.0" fitWidth="302.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/logo2.png" />
-               </image>
-            </ImageView>
-            <Text fx:id="schoolYearText" layoutX="94.0" layoutY="367.0" text="School Year:" />
-            <Text fx:id="yearText" layoutX="165.0" layoutY="367.0" text="2024-2025" />
-            <Line fx:id="dividerLine" endX="100.0" layoutX="159.0" layoutY="371.0" startX="-100.0" />
-            <ImageView fx:id="logoImage" fitHeight="257.0" fitWidth="240.0" layoutX="31.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/logo2.png" />
-               </image>
-            </ImageView>
-         </children>
-      </Pane>
 
-      <!-- USERNAME & PASSWORD FIELDS -->
-      <TextField fx:id="usernameField" layoutX="378.0" layoutY="101.0" promptText="Username or Email" />
-      <TextField fx:id="passwordField" layoutX="378.0" layoutY="163.0" promptText="Password" />
+<AnchorPane 
+  fx:id="anchorPane" 
+  prefHeight="400.0" 
+  prefWidth="600.0" 
+  xmlns="http://javafx.com/javafx/23.0.1" 
+  xmlns:fx="http://javafx.com/fxml/1" 
+  fx:controller="controllers.LoginController"><!-- mao ni ang mag connect sa controller nga para ani nga scene -->
+  <children>
 
-      <!-- USER TYPE COMBOBOX -->
-      <ComboBox fx:id="userComboBox" layoutX="401.0" layoutY="200.0" prefHeight="26.0" prefWidth="102.0" promptText="User" style="-fx-background-color: skyblue;" />
+    <!--  mao ni ang mag display og image -->
+    <Pane fx:id="leftPane" prefHeight="400.0" prefWidth="302.0" style="-fx-background-color: lightgray;">
+      <children>
+        <ImageView fx:id="sideImage" fitHeight="400.0" fitWidth="302.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+          <image>
+            <Image url="@../images/logo2.png" />
+          </image>
+        </ImageView>
 
-      <!-- LOGIN BUTTON with onAction -->
-     <Button fx:id="loginButton"
-        layoutX="378.0"
-        layoutY="244.0"
-        mnemonicParsing="false"
-        prefHeight="26.0"
-        prefWidth="150.0"
-        text="LOG IN"
-        onAction="#handleLoginButtonClick" />
+        <!-- mao ni ang mga text sa baba sa image -->
+        <Text fx:id="schoolYearText" layoutX="94.0" layoutY="367.0" text="School Year:" />
+        <Text fx:id="yearText" layoutX="167.0" layoutY="367.0" text="2024-2025" />
+        <Line fx:id="dividerLine" endX="100.0" layoutX="159.0" layoutY="371.0" startX="-100.0" />
 
+        <ImageView fx:id="logoImage" fitHeight="257.0" fitWidth="240.0" layoutX="31.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
+          <image>
+            <Image url="@../../images/logo2.png" />
+          </image>
+        </ImageView>
+      </children>
+    </Pane>
 
-      <!-- FORGOT PASSWORD LINK -->
-      <Hyperlink fx:id="forgotPasswordLink" layoutX="401.0" layoutY="285.0" text="Forget password?" />
+    <!-- mao ni ang username & password fields -->
+    <TextField fx:id="usernameField" layoutX="378.0" layoutY="101.0" promptText="Username or Email" />
+    <TextField fx:id="passwordField" layoutX="378.0" layoutY="163.0" promptText="Password" />
 
-      <!-- BACK BUTTON -->
-      <ImageView fx:id="backButton" fitHeight="39.0" fitWidth="46.0" layoutX="529.0" layoutY="340.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/back1.jpg" />
-         </image>
-      </ImageView>
+    <!-- mao ni ang pili-anan unsa ang mag login -->
+    <ComboBox fx:id="userComboBox" layoutX="401.0" layoutY="200.0" prefHeight="26.0" prefWidth="102.0" promptText="User" style="-fx-background-color: skyblue;" />
 
-      <!-- LOADING OVERLAY (BLUR EFFECT) -->
-      <AnchorPane fx:id="loadingOverlay" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: rgba(0,0,0,0.4);" visible="false">
-         <children>
-            <ProgressIndicator fx:id="loadingSpinner" layoutX="275.0" layoutY="180.0" />
-         </children>
-      </AnchorPane>
-   </children>
+    <!-- mao ni ang login button -->
+    <Button fx:id="loginButton"
+      layoutX="378.0"
+      layoutY="244.0"
+      mnemonicParsing="false"
+      prefHeight="26.0"
+      prefWidth="150.0"
+      text="LOG IN"
+      onAction="#handleLoginButtonClick" /><!--- mao ni ang function/method sa controller -->
+
+    <!-- mao ni ang forgot password link -->
+    <Hyperlink fx:id="forgotPasswordLink" layoutX="401.0" layoutY="285.0" text="Forget password?" />
+
+    <!-- mao ni ang back button -->
+    <ImageView fx:id="backButton" fitHeight="39.0" fitWidth="46.0" layoutX="529.0" layoutY="340.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+        <Image url="@../images/back1.jpg" />
+      </image>
+    </ImageView>
+
+    <!-- mao ni ang loading overlay (blur effect) -->
+    <AnchorPane fx:id="loadingOverlay" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: rgba(0,0,0,0.4);" visible="false">
+      <children>
+        <ProgressIndicator fx:id="loadingSpinner" layoutX="275.0" layoutY="180.0" />
+      </children>
+    </AnchorPane>
+  </children>
 </AnchorPane>
