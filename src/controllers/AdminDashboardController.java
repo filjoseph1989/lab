@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
 
 public class AdminDashboardController {
 
@@ -59,7 +60,7 @@ public class AdminDashboardController {
             TableColumn<Student, String> colFirst = new TableColumn<>("First Name");
             colFirst.setCellValueFactory(new PropertyValueFactory<>("firstname"));
 
-            student.getColumns().addAll(colID, colLast, colFirst);
+            student.getColumns().setAll(Arrays.asList(colID, colLast, colFirst));
             student.setItems(list);
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,41 +68,41 @@ public class AdminDashboardController {
     }
 
 
-private void loadFacultyData() {
-    ObservableList<Faculty> list = FXCollections.observableArrayList();
+    private void loadFacultyData() {
+        ObservableList<Faculty> list = FXCollections.observableArrayList();
 
-    try {
-        Connection conn = DBConnector.getConnection();
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery("SELECT facultyID, fullname, department FROM faculty");
+        try {
+            Connection conn = DBConnector.getConnection();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT facultyID, fullname, department FROM faculty");
 
-        while (rs.next()) {
-            list.add(new Faculty(
-                rs.getInt("facultyID"),  // Faculty ID
-                rs.getString("fullname"), // Full Name
-                rs.getString("department") // Department
-            ));
-        }
+            while (rs.next()) {
+                list.add(new Faculty(
+                    rs.getInt("facultyID"),  // Faculty ID
+                    rs.getString("fullname"), // Full Name
+                    rs.getString("department") // Department
+                ));
+            }
 
-        instructor.getColumns().clear();  // Clear existing columns before adding new ones
+            instructor.getColumns().clear();  // Clear existing columns before adding new ones
 
-        // Faculty ID column
-        TableColumn<Faculty, Integer> colID = new TableColumn<>("Faculty ID");
-        colID.setCellValueFactory(new PropertyValueFactory<>("facultyID"));
+            // Faculty ID column
+            TableColumn<Faculty, Integer> colID = new TableColumn<>("Faculty ID");
+            colID.setCellValueFactory(new PropertyValueFactory<>("facultyID"));
 
-        // Full Name column
-        TableColumn<Faculty, String> colName = new TableColumn<>("Full Name");
-        colName.setCellValueFactory(new PropertyValueFactory<>("fullname"));
+            // Full Name column
+            TableColumn<Faculty, String> colName = new TableColumn<>("Full Name");
+            colName.setCellValueFactory(new PropertyValueFactory<>("fullname"));
 
-        // Department column
-        TableColumn<Faculty, String> colDept = new TableColumn<>("Department");
-        colDept.setCellValueFactory(new PropertyValueFactory<>("department"));
+            // Department column
+            TableColumn<Faculty, String> colDept = new TableColumn<>("Department");
+            colDept.setCellValueFactory(new PropertyValueFactory<>("department"));
 
-        // Add columns to TableView
-        instructor.getColumns().addAll(colID, colName, colDept);
+            // Add columns to TableView
+                    instructor.getColumns().setAll(Arrays.asList(colID, colName, colDept));
 
-        // Set items to the TableView
-        instructor.setItems(list);
+            // Set items to the TableView
+            instructor.setItems(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,7 +130,7 @@ private void loadFacultyData() {
             TableColumn<Course, String> colAcronym = new TableColumn<>("Acronym");
             colAcronym.setCellValueFactory(new PropertyValueFactory<>("acronym"));
 
-            course.getColumns().addAll(colCourse, colAcronym);
+            course.getColumns().setAll(Arrays.asList(colCourse, colAcronym));
             course.setItems(list);
         } catch (Exception e) {
             e.printStackTrace();

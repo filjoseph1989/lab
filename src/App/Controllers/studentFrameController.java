@@ -36,21 +36,25 @@ public class studentFrameController {
     boolean ifOnSession=false;
     DatabaseConnection dc = new DatabaseConnection();
     @FXML private Label user;
-    public void initialize()throws Exception{
+    public void initialize() throws Exception {
         dc.connect();
-        File read = new File("studentID.txt");
-        Scanner sc = new Scanner(read);
-        while(sc.hasNextLine()){
-            studentId=sc.nextLine();
-            System.out.println("studentId: "+studentId);
+        // Initialization logic that depends on studentId has been moved to initData()
+    }
+
+    public void initData(String studentId) {
+        this.studentId = studentId;
+        System.out.println("studentId: " + this.studentId);
+        try {
+            String sql = "SELECT * FROM student WHERE studentID = '" + this.studentId + "'";
+            PreparedStatement ps = dc.con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                user.setText("Welcome " + rs.getString("firstname") + " " + rs.getString("lastname"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Data Load Error", "Failed to load student data.");
         }
-        String sql = "SELECT * FROM student WHERE studentID = '"+studentId+"'";
-        PreparedStatement ps = dc.con.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            user.setText("Welcome "+rs.getString("firstname")+" "+rs.getString("lastname"));
-        }
-        
     }
     @FXML private TableView<viewStudentPerformance> myTaskTable;
     @FXML private TableColumn<viewStudentPerformance, String> taskSubCode, taskSubDes, taskTask, taskScore;

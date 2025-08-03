@@ -37,19 +37,24 @@ import javafx.stage.FileChooser;
 public class sessionController {
     String instructorID = "";
     DatabaseConnection dc = new DatabaseConnection();
-    public void initialize()throws Exception{
+    public void initialize() throws Exception {
         dc.connect();
-        File read = new File("instructorID.txt");
-        Scanner sc = new Scanner(read);
-        while(sc.hasNextLine()){
-            instructorID=sc.nextLine();
-            System.out.println(instructorID);
+        // Initialization logic that depends on instructorID has been moved to initData()
+    }
+
+    public void initData(String instructorID) {
+        this.instructorID = instructorID;
+        System.out.println("Faculty ID set to: " + this.instructorID);
+        try {
+            Statement statement = dc.con.createStatement();
+            statement.executeUpdate("UPDATE `faculty` SET status= 'Active' WHERE facultyID = '" + this.instructorID + "'");
+
+            loadSubTable();
+            loadTasksToTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Failed to load faculty data.");
         }
-        Statement statement = dc.con.createStatement();
-        statement.executeUpdate("UPDATE `faculty` SET status= 'Active' WHERE facultyID = '"+instructorID+"'");
-        
-        loadSubTable();
-        loadTasksToTable();
     }
     
     @FXML

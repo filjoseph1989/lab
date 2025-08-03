@@ -14,15 +14,12 @@ import java.sql.DriverManager;
  * @author user
  */
 public class DatabaseConnection {
-    final String DB_URL = "jdbc:mysql://localhost/comlab";
-    final String USER = "root";
-    final String PASS = "";
-    public String url;
+    final String DB_URL = "jdbc:mysql://localhost:3306/comlab";
+    final String USER = "fil";
+    final String PASS = "password";
     public Connection con = null;
     public Connection connect() {
         
-        url = "jdbc:mysql://localhost:3306/comlab";
-
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(DB_URL, USER, PASS);

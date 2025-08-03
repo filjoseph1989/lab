@@ -21,6 +21,7 @@ import java.time.Period;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -439,7 +440,7 @@ public class adminController {
                         }
                     });
 
-                    subjectTable.getColumns().addAll(codeCol, descCol, semCol, yearCol, actionCol);
+                    subjectTable.getColumns().setAll(Arrays.asList(codeCol, descCol, semCol, yearCol, actionCol));
 
                     // Load subjects from database
                     ObservableList<subject> subjectList = FXCollections.observableArrayList();
@@ -467,7 +468,7 @@ public class adminController {
                     }
 
                     subjectTable.setItems(subjectList);
-                    subjectTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+                    subjectTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
                     VBox content = new VBox(10, subjectTable);
                     content.setPadding(new Insets(10));
@@ -534,7 +535,7 @@ public class adminController {
         TableColumn<TaskSubjectView, String> dateCol = new TableColumn<>("Date Submitted");
         dateCol.setCellValueFactory(data -> data.getValue().dateSubProperty());
 
-        taskTable.getColumns().addAll(taskCol, descCol, durationCol, statusCol, dateCol);
+        taskTable.getColumns().setAll(Arrays.asList(taskCol, descCol, durationCol, statusCol, dateCol));
 
         ObservableList<TaskSubjectView> tasks = FXCollections.observableArrayList();
         try {
@@ -566,7 +567,7 @@ public class adminController {
         }
 
         taskTable.setItems(tasks);
-        taskTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        taskTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         VBox taskBox = new VBox(10, taskTable);
         taskBox.setPadding(new Insets(10));

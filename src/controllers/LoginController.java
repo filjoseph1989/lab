@@ -2,12 +2,13 @@ package controllers;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import javafx.animation.PauseTransition;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.PasswordField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -28,7 +29,7 @@ public class LoginController {
     @FXML
     private TextField usernameField;
     @FXML
-    private TextField passwordField;
+    private PasswordField passwordField;
     @FXML
     private ComboBox<String> userComboBox;
     @FXML
@@ -46,127 +47,130 @@ public class LoginController {
         userComboBox.setValue("ADMIN");
         loadingOverlay.setVisible(false);
     }
-    boolean isValid=false;
+
     @FXML
     private void handleLoginButtonClick() {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
-        String userType = userComboBox.getValue();
-        
-        System.out.println(userType);
+        final String username = usernameField.getText().trim();
+        final String password = passwordField.getText().trim();
+        final String userType = userComboBox.getValue();
+
         if (username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Input Error", "Please fill in both fields.");
             return;
         }
 
-        // Show loading
-        loadingOverlay.setVisible(true);
-
-        // Run login check in a new thread
-        new Thread(() -> {
-            
-            try {
-                System.out.println(userType);
-                isValid = validateLogin(username, password, userType);
-            } catch (Exception ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        // Use a Task for background work to keep UI responsive
+        Task<LoginResult> loginTask = new Task<>() {
+            @Override
+            protected LoginResult call() throws Exception {
+                // Simulate network latency
+                Thread.sleep(500);
+                return validateLogin(username, password, userType);
             }
+        };
 
-            try {
-                Thread.sleep(1000); // simulate delay
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        // What to do when the task succeeds
+        loginTask.setOnSucceeded(event -> {
+            LoginResult result = loginTask.getValue();
+            if (result != null) {
+                showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + result.getUserName() + "!");
+                navigateToDashboard(userType, result.getUserId());
+                return;
             }
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid credentials. Please try again.");
+        });
 
-            javafx.application.Platform.runLater(() -> {
-                loadingOverlay.setVisible(false);
-                if (isValid) {
-                    showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + userType + "!");
-                    navigateToDashboard(userType);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid credentials. Please try again.");
-                }
-            });
-        }).start();
+        // What to do if the task fails
+        loginTask.setOnFailed(event -> {
+            showAlert(Alert.AlertType.ERROR, "Login Error", "An error occurred during login. Please check the console.");
+            loginTask.getException().printStackTrace();
+        });
+
+        // Bind loading overlay visibility to task running state
+        loadingOverlay.visibleProperty().bind(loginTask.runningProperty());
+
+        // Start the task
+        new Thread(loginTask).start();
     }
-    String id = "";
-    private boolean validateLogin(String username, String password, String userType) throws Exception{
+
+    private LoginResult validateLogin(String username, String password, String userType) throws SQLException {
         String query = "";
-        
+        String idColumn = "";
+        String nameColumn = "";
+
         switch (userType) {
             case "ADMIN":
-                query = "SELECT * FROM admin WHERE (username = ? OR email = ?) AND password = ?";
+                query = "SELECT id, username FROM admin WHERE (username = ? OR email = ?) AND password = ?";
+                idColumn = "id";
+                nameColumn = "username";
                 break;
             case "FACULTY":
-                query = "SELECT * FROM faculty WHERE (username = ? OR email = ?) AND password = ?";
+                query = "SELECT facultyID, fullname FROM faculty WHERE (username = ? OR email = ?) AND password = ?";
+                idColumn = "facultyID";
+                nameColumn = "fullname";
                 break;
             case "STUDENT":
-                query = "SELECT * FROM student WHERE (username = ? OR email = ?) AND password = ?";
+                query = "SELECT studentID, fullname FROM student WHERE (username = ? OR email = ?) AND password = ?";
+                idColumn = "studentID";
+                nameColumn = "fullname";
                 break;
             default:
-                return false;
+                return null;
         }
 
         try (Connection conn = DBConnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, username);
-            stmt.setString(2, username); // username or email
+            stmt.setString(2, username);
             stmt.setString(3, password);
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()){
-                switch (userType) {
-                    case "FACULTY":
-                        id=rs.getString("facultyID");
-                        break;
-                    case "STUDENT":
-                        id=rs.getString("studentID");
-                        break;
-                    case "ADMIN":
-                        id=rs.getString("id");
-                        System.out.println("ADMIN Log in");
-                        break;
-                    default:
-                        return true;
-                }
-                return true;
-            }
-            return false;
-             // true if record exists
 
+            if (rs.next()) {
+                String userId = rs.getString(idColumn);
+                String userName = rs.getString(nameColumn);
+                return new LoginResult(userId, userName);
+            }
+            return null; // Login failed
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            throw e; // Re-throw to be caught by onFailed handler
         }
     }
 
-    private void navigateToDashboard(String userType) {
+    private void navigateToDashboard(String userType, String userId) {
         try {
-            FXMLLoader loader;
             String fxmlPath = "";
-
             switch (userType) {
                 case "ADMIN":
                     fxmlPath = "/App/Views/admin.fxml";
                     break;
                 case "FACULTY":
                     fxmlPath = "/App/Views/Session.fxml";
-                    BufferedWriter write2 = new BufferedWriter(new FileWriter("instructorID.txt"));
-                    write2.write(id);
-                    write2.close();
                     break;
                 case "STUDENT":
                     fxmlPath = "/App/Views/studentFrame.fxml";
-                    FileWriter write3 = new FileWriter("studentID.txt");
-                    write3.write(id);
-                    write3.close();
                     break;
             }
 
             if (!fxmlPath.isEmpty()) {
-                loader = new FXMLLoader(getClass().getResource(fxmlPath));
-                AnchorPane dashboardPane = loader.load();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Parent dashboardPane = loader.load();
+
+                // Pass the userId to the new controller AFTER loading the FXML
+                switch (userType) {
+                    case "FACULTY":
+                        // Assuming sessionController has an initData(String userId) method
+                        App.Controllers.sessionController sessionCtrl = loader.getController();
+                        sessionCtrl.initData(userId); 
+                        break;
+                    case "STUDENT":
+                        // Assuming studentFrameController has an initData(String userId) method
+                        App.Controllers.studentFrameController studentCtrl = loader.getController();
+                        studentCtrl.initData(userId);
+                        break;
+                }
 
                 Stage dashboardStage = new Stage();
                 dashboardStage.setTitle(userType + " Dashboard");
@@ -195,5 +199,24 @@ public class LoginController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // Helper class to return multiple values from the login task
+    private static class LoginResult {
+        private final String userId;
+        private final String userName;
+
+        public LoginResult(String userId, String userName) {
+            this.userId = userId;
+            this.userName = userName;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
     }
 }
