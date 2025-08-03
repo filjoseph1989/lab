@@ -149,16 +149,17 @@ public class LoginController {
 
             switch (userType) {
                 case "ADMIN":
-                    fxmlPath = "/App/Views/admin.fxml";
+                    fxmlPath = "/views/admin/admindashboard.fxml";
                     break;
                 case "FACULTY":
-                    fxmlPath = "/App/Views/Session.fxml";
+                    fxmlPath = "/views/instructor/instructordashboard.fxml";
                     BufferedWriter write2 = new BufferedWriter(new FileWriter("instructorID.txt"));
                     write2.write(id);
                     write2.close();
                     break;
                 case "STUDENT":
-                    fxmlPath = "/App/Views/studentFrame.fxml";
+                    // NOTE: Assuming student dashboard path as the original was incorrect.
+                    fxmlPath = "/views/student/studentdashboard.fxml";
                     FileWriter write3 = new FileWriter("studentID.txt");
                     write3.write(id);
                     write3.close();
