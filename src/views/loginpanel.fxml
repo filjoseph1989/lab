@@ -42,7 +42,7 @@
 
     <!-- mao ni ang username & password fields -->
     <TextField fx:id="usernameField" layoutX="378.0" layoutY="101.0" promptText="Username or Email" />
-    <TextField fx:id="passwordField" layoutX="378.0" layoutY="163.0" promptText="Password" />
+    <PasswordField fx:id="passwordField" layoutX="378.0" layoutY="163.0" promptText="Password" />
 
     <!-- mao ni ang pili-anan unsa ang mag login -->
     <ComboBox fx:id="userComboBox" layoutX="401.0" layoutY="200.0" prefHeight="26.0" prefWidth="102.0" promptText="User" style="-fx-background-color: skyblue;" />

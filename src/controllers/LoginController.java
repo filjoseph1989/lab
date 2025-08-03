@@ -28,7 +28,7 @@ public class LoginController {
     @FXML
     private TextField usernameField;
     @FXML
-    private TextField passwordField;
+    private PasswordField passwordField;
     @FXML
     private ComboBox<String> userComboBox;
     @FXML
@@ -54,8 +54,9 @@ public class LoginController {
         String userType = userComboBox.getValue();
         
         System.out.println(userType);
+
         if (username.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Input Error", "Please fill in both fields.");
+            showAlert(Alert.AlertType.WARNING, "Input Error", "username and password cannot be empty.");
             return;
         }
 
