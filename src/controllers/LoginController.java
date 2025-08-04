@@ -126,7 +126,6 @@ public class LoginController {
                         break;
                     case "ADMIN":
                         id=rs.getString("id");
-                        System.out.println("ADMIN Log in");
                         break;
                     default:
                         return true;

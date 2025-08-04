@@ -13,16 +13,22 @@ public class DBConnector {
     private static Connection connection = null; // ✅ Missing field added
 
     // Private constructor to prevent instantiation
-    public DBConnector() {}
+    private DBConnector() {}
 
     // Get the single connection instance
     public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            try {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new SQLException("Error connecting to the database.");
+        // Double-checked locking for thread safety and performance
+        if (connection == null || connection.isClosed()) { // First check (not synchronized)
+            synchronized (DBConnector.class) {
+                if (connection == null || connection.isClosed()) { // Second check (synchronized)
+                    try {
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                    } catch (SQLException e) {
+                        // It's better to log the exception and re-throw a more specific one
+                        // or handle it appropriately rather than just printing the stack trace.
+                        throw new SQLException("Failed to connect to the database.", e);
+                    }
+                }
             }
         }
         return connection;
