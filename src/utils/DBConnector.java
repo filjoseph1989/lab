@@ -5,12 +5,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnector {
-
+    // kani nga mga properties mao ni ang credentials sa pag connect sa database
     private static final String URL = "jdbc:mysql://localhost:3306/comlab";
     private static final String USER = "fil";
     private static final String PASSWORD = "password";
 
-    private static Connection connection = null; // ✅ Missing field added
+    private static Connection connection = null;
 
     // Private constructor to prevent instantiation
     public DBConnector() {}

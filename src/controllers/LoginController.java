@@ -111,7 +111,7 @@ public class LoginController {
                 break;
             case "FACULTY": // kung faculty kani ang i-run
                 query = "SELECT * FROM faculty WHERE (username = ? OR email = ?) AND password = ?";
-                // query = "SELECT * FROM faculty WHERE (username = 'admin' OR email = 'admin') AND password = 'admin'";
+                // query = "SELECT * FROM faculty WHERE (username = 'jhon' OR email = 'jhon') AND password = '1234'";
                 break;
             case "STUDENT": // kung student kani ang i-run
                 query = "SELECT * FROM student WHERE (username = ? OR email = ?) AND password = ?";
@@ -122,7 +122,7 @@ public class LoginController {
         }
 
         // 
-        try (Connection conn = DBConnector.getConnection(); // tawagun niya ang src/utils/DBConnector.java
+        try (Connection conn = DBConnector.getConnection(); // tawagun niya ang class nga naa sa file src/utils/DBConnector.java
             PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, username);
