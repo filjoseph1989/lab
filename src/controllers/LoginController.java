@@ -101,10 +101,10 @@ public class LoginController {
 
     // dawatung dri ang username, password, userType
     private boolean validateLogin(String username, String password, String userType) throws Exception{
-        String query = "";
+        String query = ""; // initialize ni nga variable as empty string
         
         // kaning switch, kung ang gi-pili sa dropdown kay admin, faculty, student
-        switch (userType) {
+        switch (userType) { // check niya ang userType, then mag-decide asa iyang i-run sa mga case sa baba
             case "ADMIN": // kung admin kani ang i-run
                 query = "SELECT * FROM admin WHERE (username = ? OR email = ?) AND password = ?";
                 // query = "SELECT * FROM admin WHERE (username = 'admin' OR email = 'admin') AND password = 'admin'";
@@ -117,38 +117,40 @@ public class LoginController {
                 query = "SELECT * FROM student WHERE (username = ? OR email = ?) AND password = ?";
                 // query = "SELECT * FROM student WHERE (username = 'nathan' OR email = 'nathan') AND password = '090807'";
                 break;
-            default:
+            default: // kung wala'y naka run nga case kani ang i-run, return false
                 return false;
         }
 
-        // 
+        // connect sa database
         try (Connection conn = DBConnector.getConnection(); // tawagun niya ang class nga naa sa file src/utils/DBConnector.java
-            PreparedStatement stmt = conn.prepareStatement(query)) {
+            PreparedStatement stmt = conn.prepareStatement(query)) { // prepare niya ang query
 
-            stmt.setString(1, username);
-            stmt.setString(2, username); // username or email
-            stmt.setString(3, password);
+            // katong query variable sa taas pag naa nato query string, ang mga (?, ?, ?) kay pulihan ani nga statement
+            stmt.setString(1, username); // set niya ang value sa username
+            stmt.setString(2, username); // set niya ang value sa username or email
+            stmt.setString(3, password); // set niya ang value sa password
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()){
-                switch (userType) {
-                    case "FACULTY":
+            ResultSet rs = stmt.executeQuery(); // execute niya ang query, ibutang sa rs ang resulta
+
+            if (rs.next()){ // kani re.next() tanawun niya ang resulta kung naa first row, then mag true ang if condition, tapos i-run niya ang code sa baba
+                switch (userType) { // check niya ang userType
+                    case "FACULTY": // kung faculty kani ang i-run
                         id=rs.getString("facultyID");
                         break;
-                    case "STUDENT":
+                    case "STUDENT": // kung student kani ang i-run
                         id=rs.getString("studentID");
                         break;
-                    case "ADMIN":
+                    case "ADMIN": // kung admin kani ang i-run
                         id=rs.getString("id");
                         System.out.println("ADMIN Log in");
                         break;
-                    default:
+                    default: // kung wala'y naka run nga case kani ang i-run
                         return true;
                 }
                 return true;
             }
-            return false;
-             // true if record exists
+            
+            return false; // false if record does not exist
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,17 +163,17 @@ public class LoginController {
             FXMLLoader loader;
             String fxmlPath = "";
 
-            switch (userType) {
-                case "ADMIN":
+            switch (userType) { // check niya ang userType
+                case "ADMIN": // kung admin kani ang i-run
                     fxmlPath = "/App/Views/admin.fxml";
                     break;
-                case "FACULTY":
+                case "FACULTY": // kung faculty kani ang i-run
                     fxmlPath = "/App/Views/Session.fxml";
                     BufferedWriter write2 = new BufferedWriter(new FileWriter("instructorID.txt"));
                     write2.write(id);
                     write2.close();
                     break;
-                case "STUDENT":
+                case "STUDENT": // kung student kani ang i-run
                     fxmlPath = "/App/Views/studentFrame.fxml";
                     FileWriter write3 = new FileWriter("studentID.txt");
                     write3.write(id);
