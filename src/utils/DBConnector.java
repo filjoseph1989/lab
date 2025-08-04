@@ -15,16 +15,19 @@ public class DBConnector {
     // Private constructor to prevent instantiation
     public DBConnector() {}
 
-    // Get the single connection instance
+    // kani nga method mao ni ang connection sa database
     public static Connection getConnection() throws SQLException {
+        // kung ang variable connection kay null so wala pa naka connect sa database
+        // or kung na disconnect na siya sa database mahimong true ang condition diri
         if (connection == null || connection.isClosed()) {
-            try {
+            try { // kani try kay i-try niya run ang line pag connect, kung naa error mo-adto sa catch
+                // diri mag connect sa database gamit ang username og password
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new SQLException("Error connecting to the database.");
+            } catch (SQLException e) { // so kung naa error sa pag connect sa database kani ang mo run
+                e.printStackTrace(); // i print ang mga line nga nag trace sa error
+                throw new SQLException("Error connecting to the database."); // mao ni message sa reason sa error
             }
         }
-        return connection;
+        return connection; // kani mao mani ang variable sa line 13, dili na ni null once naka connect na sa database
     }
 }
