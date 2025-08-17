@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="mainContent" prefHeight="586.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AdminDashboardController">
+<AnchorPane fx:id="mainContent" prefHeight="586.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AdminDashboardController">
    <children>
       <ImageView fitHeight="97.0" fitWidth="140.0" layoutX="35.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -21,13 +21,13 @@
       <Line endX="-17.999984741210938" layoutX="142.0" layoutY="117.0" startX="-100.0" />
 
       <!-- Instructor Table -->
- <TableView fx:id="instructor" layoutX="155.0" layoutY="163.0" prefHeight="198.0" prefWidth="334.0">
-    <columns>
-        <TableColumn fx:id="facultyIDCol" prefWidth="103.2" text="Faculty ID" />
-        <TableColumn fx:id="facultyNameCol" prefWidth="230.4" text="Full Name" />
-        <TableColumn fx:id="departmentCol" prefWidth="230.4" text="Department" />
-    </columns>
-</TableView>
+      <TableView fx:id="instructor" layoutX="155.0" layoutY="163.0" prefHeight="198.0" prefWidth="334.0">
+         <columns>
+            <TableColumn fx:id="facultyIDCol" prefWidth="103.2" text="Faculty ID" />
+            <TableColumn fx:id="facultyNameCol" prefWidth="230.4" text="Full Name" />
+            <TableColumn fx:id="departmentCol" prefWidth="230.4" text="Department" />
+         </columns>
+      </TableView>
 
 
       <!-- Title -->
@@ -38,7 +38,7 @@
       </Text>
 
       <!-- Buttons -->
-      <Button fx:id="logoutButton" layoutX="14.0" layoutY="545.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="26.0" prefWidth="129.0" text="LOG OUT">
+      <Button fx:id="logoutButton" layoutX="14.0" layoutY="545.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="26.0" prefWidth="129.0" text="LOG OUT 1">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
